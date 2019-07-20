@@ -1,0 +1,20 @@
+{
+  "name": "fmng",
+  "version": "1.0.0",
+  "description": "simple file manager for NodeJS",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kearfy/fmng.git"
+  },
+  "keywords": [
+    "fmng",
+    "file"
+  ],
+  "author": "Micha de Vries",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kearfy/fmng/issues"
+  },
+  "homepage": "https://github.com/kearfy/fmng#readme"
+}
