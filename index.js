@@ -1,43 +1,102 @@
+// Copyright FMNG 2019, a product by Micha de Vries.
+// I am not responsible for any (if possible) damages made.
+// for bugs, please report them at the github repo which can be found at https://github.com/kearfy/fmng
+// for suggestions, contant me through discord ( @kearfy#2139 ) or open an issue where you formally describe your feature request.
+// A site for issue / bugs and suggestions will soon be made.
+
 const fs = require('fs');
 
-class Sync {
+//logging
+
+log(msg) {
+    if (msg !== undefined) {
+        var date = new Date();
+        var today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
+        var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
+        try {
+            fs.appendFileSync(__dirname + '/logs/' + today + '.fmng.log', '[' + time + '] ~ ' + msg + "\n");
+        } catch(e) {
+            console.log('JDB ERROR: COULD NOT WRITE TO LOG! LOGGING ERROR(S).', e);
+            return false;
+        }
+    } else {
+        console.log('JDB ERROR: LOG MESSAGE MUST BE GIVEN IN!');
+        return false;
+    }
+
+    return true;
+}
+
+class Fmng {
 
     //check if file / dir exists
 
         exists(file) {
-            return fs.existsSync(file);
+            try {
+                var result = fs.existsSync(file);
+            } catch(e) {
+                console.log('E: fmng.exists() ~> could not check if path exists! logging error', e);
+                log('E: fmng.exists() ~> could not check if path exists! logging error');
+                log(e);
+                return false;
+            }
+
+            return result;
         }
 
     //check if path is a file
 
-        isfile(path) {
-            return fs.statSync(path).isFile();
+        isfile(path, caller) {
+            var caller = (caller !== undefined ? caller : 'mkfile');
+
+            try {
+                var result = fs.statSync(path).isFile();
+            } catch(e) {
+                console.log('E: fmng.' + caller + '() ~> could not check if path is file! logging error', e);
+                log('E: fmng.' + caller + '() ~> could not check if path is file! logging error');
+                log(e);
+                return false;
+            }
+
+            return result;
         }
 
-        isFile(path) { return this.isfile(path); }
+        isFile(path) { return this.isfile(path, 'isFile'); }
 
     //check if path is a directory
 
-        isdir(path) {
-            return fs.statSync(path).isDirectory();
+        isdir(path, caller) {
+            var caller = (caller !== undefined ? caller : 'mkfile');
+
+            try {
+                var result = fs.statSync(path).isDirectory();
+            } catch(e) {
+                console.log('E: fmng.' + caller + '() ~> could not check if path is directory! logging error', e);
+                log('E: fmng.' + caller + '() ~> could not check if path is directory! logging error');
+                log(e);
+                return false;
+            }
+
+            return result;
         }
 
-        isDir(path) { return this.isdir(path); }
-        isdirectory(path) { return this.isdir(path); }
-        isDirectory(path) { return this.isdir(path); }
+        isDir(path) { return this.isdir(path, 'isDir'); }
+        isdirectory(path) { return this.isdir(path, 'isdirectory'); }
+        isDirectory(path) { return this.isdir(path, 'isDirectory'); }
 
     //write to file
 
         write(path, content = '') {
             if (this.isFile(path)) {
-                if (!this.exists(path)) { console.log('N: fmng.sync.write() ~> file does not exist yet, creating it...'); }
+                if (!this.exists(path)) { console.log('N: fmng.write() ~> file does not exist yet, creating it...'); }
 
                 try {
                     fs.writeFileSync(path, content);
                 } catch(e) {
-                    console.log('E: fmng.sync.write() ~> could not write to file! logging error', e);
-                    this.log('E: fmng.sync.write() ~> could not write to file! logging error');
-                    this.log(e);
+                    console.log('E: fmng.write() ~> could not write to file! logging error', e);
+                    log('E: fmng.write() ~> could not write to file! logging error');
+                    log(e);
                     return false;
                 }
             } else {
@@ -50,14 +109,14 @@ class Sync {
 
         append(path, content) {
             if (this.isFile(path)) {
-                if (!this.exists(path)) { console.log('N: fmng.sync.append() ~> file does not exist yet, creating it...'); }
+                if (!this.exists(path)) { console.log('N: fmng.append() ~> file does not exist yet, creating it...'); }
 
                 try {
                     fs.appendFileSync(path, content);
                 } catch(e) {
-                    console.log('E: fmng.sync.append() ~> could not append to file! logging error', e);
-                    this.log('E: fmng.sync.append() ~> could not append to file! logging error');
-                    this.log(e);
+                    console.log('E: fmng.append() ~> could not append to file! logging error', e);
+                    log('E: fmng.append() ~> could not append to file! logging error');
+                    log(e);
                     return false;
                 }
             } else {
@@ -77,9 +136,9 @@ class Sync {
                 try {
                     fs.writeFileSync(path, content);
                 } catch(e) {
-                    console.log('E: fmng.sync.' + caller + '() ~> could not write to file! logging error', e);
-                    this.log('E: fmng.sync.' + caller + '() ~> could not write to file! logging error');
-                    this.log(e);
+                    console.log('E: fmng.' + caller + '() ~> could not write to file! logging error', e);
+                    log('E: fmng.' + caller + '() ~> could not write to file! logging error');
+                    log(e);
                     return false;
                 }
             } else {
@@ -106,13 +165,13 @@ class Sync {
                 try {
                     fs.mkdirSync(path);
                 } catch(e) {
-                    console.log('E: fmng.sync.' + caller + '() ~> could not create directory! logging error', e);
-                    this.log('E: fmng.sync.' + caller + '() ~> could not create directory! logging error');
-                    this.log(e);
+                    console.log('E: fmng.' + caller + '() ~> could not create directory! logging error', e);
+                    log('E: fmng.' + caller + '() ~> could not create directory! logging error');
+                    log(e);
                     return false;
                 }
             } else {
-                console.log('E: fmng.sync.' + caller + '() ~> path already exists!');
+                console.log('E: fmng.' + caller + '() ~> path already exists!');
                 return false;
             }
 
@@ -135,17 +194,17 @@ class Sync {
                     try {
                         var content = fs.readFileSync(path, encoding);
                     } catch(e) {
-                        console.log('E: fmng.sync.' + caller + '() ~> could not read file! logging error', e);
-                        this.log('E: fmng.sync.' + caller + '() ~> could not read file! logging error');
-                        this.log(e);
+                        console.log('E: fmng.' + caller + '() ~> could not read file! logging error', e);
+                        log('E: fmng.' + caller + '() ~> could not read file! logging error');
+                        log(e);
                         return false;
                     }
                 } else {
-                    console.log('E: fmng.sync.' + caller + '() ~> path must be pointed to a file!');
+                    console.log('E: fmng.' + caller + '() ~> path must be pointed to a file!');
                     return false;
                 }
             } else {
-                console.log('E: fmng.sync.' + caller + '() ~> file does not exist!');
+                console.log('E: fmng.' + caller + '() ~> file does not exist!');
                 return false;
             }
 
@@ -179,13 +238,13 @@ class Sync {
                         fs.rmdirSync(path);
                     }
                 } catch(e) {
-                    console.log('E: fmng.sync.' + caller + '() ~> could not remove ' + (this.isfile(path) ? 'file' : 'directory') + '! logging error', e);
-                    this.log('E: fmng.sync.' + caller + '() ~> could not remove ' + (this.isfile(path) ? 'file' : 'directory') + '! logging error');
-                    this.log(e);
+                    console.log('E: fmng.' + caller + '() ~> could not remove ' + (this.isfile(path) ? 'file' : 'directory') + '! logging error', e);
+                    log('E: fmng.' + caller + '() ~> could not remove ' + (this.isfile(path) ? 'file' : 'directory') + '! logging error');
+                    log(e);
                     return false;
                 }
             } else {
-                console.log('E: fmng.sync.' + caller + '() ~> path does not exists!');
+                console.log('E: fmng.' + caller + '() ~> path does not exists!');
                 return false;
             }
 
@@ -196,38 +255,6 @@ class Sync {
         rem(path, input = false) { return this.unlink(path, input, 'remove'); }
         delete(path, input = false) { return this.unlink(path, input, 'remove'); }
         del(path, input = false) { return this.unlink(path, input, 'remove'); }
-
-    //log system
-
-        log(msg) {
-            if (msg !== undefined) {
-                var date = new Date();
-                var today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
-                var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-
-                try {
-                    fs.appendFileSync(__dirname + '/logs/' + today + '.txt', '[' + time + '] ~ ' + msg + "\n");
-                } catch(e) {
-                    console.log('JDB ERROR: COULD NOT WRITE TO LOG! LOGGING ERROR(S).', e);
-                    return false;
-                }
-            } else {
-                console.log('JDB ERROR: LOG MESSAGE MUST BE GIVEN IN!');
-                return false;
-            }
-
-            return true;
-        }
-
 }
 
-class Async {
-
-}
-
-module.exports = {
-    Sync: Sync,
-    Async: Async,
-    sync: new Sync,
-    async: new Async
-}
+module.exports = new Fmng();
