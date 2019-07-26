@@ -8,7 +8,7 @@ const fs = require('fs');
 
 //logging
 
-log(msg) {
+function log(msg) {
     if (msg !== undefined) {
         var date = new Date();
         var today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
